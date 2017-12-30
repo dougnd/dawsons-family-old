@@ -13,6 +13,24 @@ backup:
 	cp $(backup_dir)/latest.tar.gz backup/latest.tar.gz
 	cp backup/latest.tar.gz backup/$(backup_name).tar.gz
 
-.PHONY: backup
+
+fetch-latest-prod-backup:
+	scp root@dawsons.family:dawsons-family/backup/latest.tar.gz backup
+
+rebuild:
+	rm -rf $(backup_dir)
+	mkdir -p $(backup_dir)
+	cp backup/latest.tar.gz $(backup_dir)/latest.tar.gz
+	cd $(backup_dir) && tar xvf latest.tar.gz
+	docker-compose down -v --remove-orphans
+	docker-compose build 
+	docker-compose up -d db 
+	sleep 30
+	docker exec -i $(db_container) sh -c 'exec mysql openeats -uroot -p"$$MYSQL_ROOT_PASSWORD"' < $(backup_dir)/db.sql
+	docker-compose up -d 
+	sleep 20
+	docker run --rm --volumes-from $(api_container) -v $(backup_dir):/backup alpine sh -c "cd /code/site-media && tar xvf /backup/img.tar --strip 1"
+
+.PHONY: backup rebuild
 
 
