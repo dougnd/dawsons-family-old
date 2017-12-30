@@ -6,6 +6,7 @@
 
 sed -i "s/API_PORT/$API_PORT/g" /etc/nginx/conf.d/default.conf;
 sed -i "s/NODE_PORT/$NODE_PORT/g" /etc/nginx/conf.d/default.conf;
+sed -i "s/OPENEATS_DOMAIN/$OPENEATS_DOMAIN/g" /etc/nginx/conf.d/default.conf;
 
 # Start the NGINX service.
 
