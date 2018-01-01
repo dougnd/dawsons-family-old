@@ -17,7 +17,14 @@ backup:
 fetch-latest-prod-backup:
 	scp root@dawsons.family:dawsons-family/backup/latest.tar.gz backup
 
-rebuild:
+update-imgs:
+	docker pull openeats/api:latest
+	docker pull openeats/node:latest
+
+update: update-imgs
+	docker-compose up -d --build
+
+rebuild: update-imgs
 	rm -rf $(backup_dir)
 	mkdir -p $(backup_dir)
 	cp backup/latest.tar.gz $(backup_dir)/latest.tar.gz
@@ -31,6 +38,6 @@ rebuild:
 	sleep 20
 	docker run --rm --volumes-from $(api_container) -v $(backup_dir):/backup alpine sh -c "cd /code/site-media && tar xvf /backup/img.tar --strip 1"
 
-.PHONY: backup rebuild
+.PHONY: backup rebuild update update-imgs
 
 
