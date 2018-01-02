@@ -1,7 +1,7 @@
 version: '2'
 services:
   api:
-    image: openeats/api
+    image: dougnd/openeats-api
     container_name: df_oe_api
     command: /startup/prod-entrypoint.sh
     restart: on-failure
@@ -13,7 +13,7 @@ services:
     env_file:
       env_prod.list
   node:
-    image: openeats/node
+    image: dougnd/openeats-node
     container_name: df_oe_node
     command: npm start
     depends_on:

@@ -2,6 +2,7 @@ backup_dir = /tmp/df_backup
 db_container = df_db
 api_container = df_oe_api
 backup_name = $(shell date '+%d-%m-%Y-%H_%M_%S')
+tag_name = `git describe --tags --dirty`
 
 backup:
 	rm -rf $(backup_dir)
@@ -18,8 +19,8 @@ fetch-latest-prod-backup:
 	scp root@dawsons.family:dawsons-family/backup/latest.tar.gz backup
 
 update-imgs:
-	docker pull openeats/api:latest
-	docker pull openeats/node:latest
+	docker pull dougnd/openeats-api:latest
+	docker pull dougnd/openeats-node:latest
 
 update: update-imgs
 	docker-compose up -d --build
@@ -38,6 +39,20 @@ rebuild: update-imgs
 	sleep 20
 	docker run --rm --volumes-from $(api_container) -v $(backup_dir):/backup alpine sh -c "cd /code/site-media && tar xvf /backup/img.tar --strip 1"
 
-.PHONY: backup rebuild update update-imgs
+OpenEats:
+	git clone https://github.com/dougnd/OpenEats.git
 
+push-openeats: OpenEats
+	cd OpenEats && git pull
+	cd OpenEats && docker-compose build
+	cd OpenEats && docker tag openeats_api dougnd/openeats-api:latest
+	cd OpenEats && docker push dougnd/openeats-api:latest
+	cd OpenEats && docker tag openeats_node dougnd/openeats-node:latest
+	cd OpenEats && docker push dougnd/openeats-node:latest
+	cd OpenEats && docker tag openeats_api dougnd/openeats-api:$(tag_name)
+	cd OpenEats && docker push dougnd/openeats-api:$(tag_name)
+	cd OpenEats && docker tag openeats_node dougnd/openeats-node:$(tag_name)
+	cd OpenEats && docker push dougnd/openeats-node:$(tag_name)
+
+.PHONY: backup rebuild update update-imgs push-openeats
 
