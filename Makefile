@@ -4,6 +4,8 @@ api_container = df_oe_api
 backup_name = $(shell date '+%d-%m-%Y-%H_%M_%S')
 tag_name = `git describe --tags --dirty`
 
+compose = compose
+
 backup:
 	rm -rf $(backup_dir)
 	mkdir -p $(backup_dir)
@@ -23,19 +25,21 @@ update-imgs:
 	docker pull dougnd/openeats-node:latest
 
 update: update-imgs
-	docker-compose up -d --build
+	docker-compose -f docker-$(compose).yml up -d --build
+	docker-compose -f docker-$(compose).yml run --rm --entrypoint 'python manage.py migrate' api
 
 rebuild: update-imgs
 	rm -rf $(backup_dir)
 	mkdir -p $(backup_dir)
 	cp backup/latest.tar.gz $(backup_dir)/latest.tar.gz
 	cd $(backup_dir) && tar xvf latest.tar.gz
-	docker-compose down -v --remove-orphans
-	docker-compose build 
-	docker-compose up -d db 
+	docker-compose -f docker-$(compose).yml down -v --remove-orphans
+	docker-compose -f docker-$(compose).yml build 
+	docker-compose -f docker-$(compose).yml up -d db 
 	sleep 30
 	docker exec -i $(db_container) sh -c 'exec mysql openeats -uroot -p"$$MYSQL_ROOT_PASSWORD"' < $(backup_dir)/db.sql
-	docker-compose up -d 
+	docker-compose -f docker-$(compose).yml run --rm --entrypoint 'python manage.py migrate' api
+	docker-compose -f docker-$(compose).yml up -d 
 	sleep 20
 	docker run --rm --volumes-from $(api_container) -v $(backup_dir):/backup alpine sh -c "cd /code/site-media && tar xvf /backup/img.tar --strip 1"
 

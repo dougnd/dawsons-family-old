@@ -1,0 +1,48 @@
+version: '2'
+services:
+  api:
+    build: OpenEats/api/
+    container_name: df_oe_api
+    command: /startup/prod-entrypoint.sh
+    restart: on-failure
+    volumes:
+      - static-files:/code/static-files
+      - site-media:/code/site-media
+    depends_on:
+      - db
+    env_file:
+      env_prod.list
+  node:
+    build: OpenEats/frontend/
+    container_name: df_oe_node
+    command: npm start
+    depends_on:
+      - api
+    volumes:
+      - node_modules:/code/node_modules
+    env_file:
+      env_prod.list
+  db:
+    image: mariadb
+    container_name: df_db
+    env_file:
+      env_prod.list
+  nginx:
+    build: services/
+    container_name: df_nginx
+    command: ./start.sh
+    ports:
+      - "80:80"
+    volumes:
+      - static-files:/var/www/html/openeats-static/static-files
+      - site-media:/var/www/html/openeats-static/site-media
+    depends_on:
+      - api
+      - node
+    env_file:
+      env_prod.list
+volumes:
+  database:
+  node_modules:
+  static-files:
+  site-media:
