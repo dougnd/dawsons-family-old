@@ -34,6 +34,7 @@ services:
     volumes:
       - static-files:/var/www/html/openeats-static/static-files
       - site-media:/var/www/html/openeats-static/site-media
+      - /var/www/letsencrypt:/var/www/letsencrypt
     depends_on:
       - api
       - node
