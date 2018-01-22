@@ -31,10 +31,12 @@ services:
     command: ./start.sh
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - static-files:/var/www/html/openeats-static/static-files
       - site-media:/var/www/html/openeats-static/site-media
       - /var/www/letsencrypt:/var/www/letsencrypt
+      - /etc/letsencrypt:/etc/letsencrypt
     depends_on:
       - api
       - node
