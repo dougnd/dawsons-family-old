@@ -38,6 +38,7 @@ services:
       - static-files:/var/www/html/openeats-static/static-files
       - site-media:/var/www/html/openeats-static/site-media
       - public-ui:/var/www/html/openeats-static/public-ui
+      - /root/research/vtdoc:/var/www/html/research/vtdoc
       - /var/www/letsencrypt:/var/www/letsencrypt
       - /etc/letsencrypt:/etc/letsencrypt
     depends_on:
