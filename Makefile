@@ -21,12 +21,12 @@ fetch-latest-prod-backup:
 	scp root@dawsons.family:dawsons-family/backup/latest.tar.gz backup
 
 update-imgs:
-	docker pull dougnd/openeats-api:latest
-	docker pull dougnd/openeats-node:latest
+	docker pull openeats/openeats-api:latest
+	docker pull openeats/openeats-web:latest
+	cd openeats-api && docker build -t dougnd/openeats-api .
 
 update: update-imgs
 	docker-compose -f docker-$(compose).yml up -d --build
-	docker-compose -f docker-$(compose).yml run --rm --entrypoint 'python manage.py migrate' api
 
 rebuild: update-imgs
 	rm -rf $(backup_dir)

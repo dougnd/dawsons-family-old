@@ -13,11 +13,13 @@ services:
     env_file:
       env_prod.list
   node:
-    image: dougnd/openeats-node
+    image: openeats/openeats-web
     container_name: df_oe_node
-    command: npm start
+    command: yarn start
     depends_on:
       - api
+    volumes:
+      - public-ui:/code/build
     env_file:
       env_prod.list
   db:
@@ -35,6 +37,7 @@ services:
     volumes:
       - static-files:/var/www/html/openeats-static/static-files
       - site-media:/var/www/html/openeats-static/site-media
+      - public-ui:/var/www/html/openeats-static/public-ui
       - /var/www/letsencrypt:/var/www/letsencrypt
       - /etc/letsencrypt:/etc/letsencrypt
     depends_on:
@@ -46,3 +49,4 @@ volumes:
   database:
   static-files:
   site-media:
+  public-ui:
