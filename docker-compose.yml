@@ -45,10 +45,20 @@ services:
     depends_on:
       - api
       - node
+      - fathom
     env_file:
       env_prod.list
+  fathom:
+    image: usefathom/fathom:latest
+    container_name: df_fathom
+    env_file:
+      env_prod.list
+    volumes:
+      - fathom-db:/var/fathom-db
+
 volumes:
   database:
   static-files:
   site-media:
   public-ui:
+  fathom-db:
