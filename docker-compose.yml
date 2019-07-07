@@ -40,6 +40,7 @@ services:
       - public-ui:/var/www/html/openeats-static/public-ui
       - /root/research/vtdoc:/var/www/html/research/vtdoc
       - /root/OutOfArtifice-staging/public:/var/www/html/OutOfArtifice-staging
+      - /root/OutOfArtifice-prod/public:/var/www/html/OutOfArtifice-prod
       - /var/www/letsencrypt:/var/www/letsencrypt
       - /etc/letsencrypt:/etc/letsencrypt
     depends_on:
